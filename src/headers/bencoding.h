@@ -16,6 +16,13 @@
 // so we don't have to use 2 bytes for small vars
 typedef unsigned char byte;
 
+typedef enum {
+    BString_t,
+    BInt_t,
+    BList_t,
+    BDict_t,
+} BType;
+
 /* Byte String:
  * Byte strings are encoded like: <length in ASCII>:<string>
  * Example: "4:spam" represents the string "spam"
@@ -53,11 +60,33 @@ unsigned char validate_bint(char* input);
 
 /* 
  * */
-typedef struct {} BList;
+typedef struct __CTOR_BLIST_NODE__ { // need an ugly name to reference in `next` field
+    BType type;
+    void* data;
+    struct __CTOR_BLIST_NODE__ *next;
+} BListNode;
+
+typedef struct {
+    BListNode* head;
+    int length;
+} BList;
 
 /* 
  * */
-typedef struct {} BDict;
+// We purposefully choose not to implement a hash table here because for the expected
+// size of the dictionaries (according to the .torrent file spec), they're small enough
+// that linear-time indexing is probably faster than most hash functions.
+typedef struct __CTOR_BDICT_NODE__ { // need an ugly name to reference in `next` field
+    BType key_type;
+    void* key;
+    BType value_type;
+    void* value;
+    struct __CTOR_BDICT_NODE__ *next;
+} BDictNode;
+
+typedef struct {
+    BDictNode* head;
+} BDict;
 
 #endif
 
