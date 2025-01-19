@@ -1,5 +1,13 @@
 /* C implementation of all the data types under 'Bencoding' in the BitTorrent spec.
  * See: https://wiki.theory.org/BitTorrentSpecification#Bencoding
+ *
+ * NOTE:
+ * The design of the parsers includes two stages: validation and parsing. The motivation
+ * behind separating these two phases is to abstract out any 'effects', i.e. IO and 
+ * exception handling, from the actual parsing logic. Validating the inputs beforehand
+ * provides benefits to both performance and the ergonomics of exception handling.
+ * Due to this, any function calling the parsers should ensure they are taking valid 
+ * input (this can be done with the provided validator functions).
  * */
 
 #ifndef __CTOR_BENCODING__
