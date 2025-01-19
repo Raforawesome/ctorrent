@@ -14,14 +14,9 @@
 #ifndef __CTOR_PARSER__
 #define __CTOR_PARSER__
 
-typedef union {
-    char* file_path;
-    char* magnet_link;
-} Paths;
-
 typedef struct {
     int using_file; // 1 if using a .torrent file, 0 if magnet link
-    Paths paths; // a path to the torrent file to load
+    char* path; // a path to the torrent file to load, or a magnet link
 } Args;
 
 Args parse_args(int argc, char** argv);

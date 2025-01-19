@@ -26,14 +26,16 @@ Args parse_args(int argc, char** argv) {
             case 'm': // flag -m
                 if (tflag) eflag++; // if we also defined a file, this is an error
                 else {
-                    args.paths.magnet_link = optarg;
+                    args.path = optarg;
+                    args.using_file = 0;
                     mflag++;
                 }
                 break;
             case 't': // flag -t
                 if (mflag) eflag++; // if we also defined magnet, this is an error
                 else {
-                    args.paths.file_path = optarg;
+                    args.path = optarg;
+                    args.using_file = 1;
                     tflag++;
                 }
                 break;
@@ -47,7 +49,6 @@ Args parse_args(int argc, char** argv) {
         }
     }
 
-    printf("mflag: %d, tflag: %d,  eflag: %d\n", mflag, tflag, eflag);
     if ((mflag || tflag) && !eflag) {
         return args;
     }
