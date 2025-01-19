@@ -64,9 +64,14 @@ ByteString parse_bstring_unchecked(char* input) {
         raw_num[d++] = c; // add it to our number string (no checking needed)
         input++;
     }
+    int len = stoi(raw_num, d);
+    char new_str[len]; // allocate new string
+    for (int i = 0; i < len; i++)
+        new_str[i] = *(++input); // skip over ':'
+    new_str[len] = '\0'; // null-terminate string
 
-    new.repr = ++input; // skip over ':'
-    new.length = stoi(raw_num, d);
+    new.repr = new_str;
+    new.length = len;
     return new;
 }
 
@@ -91,4 +96,11 @@ BInt parse_bint_unchecked(char* input) {
     while ((c = *(++input)) != 'e') // skip first letter
         raw_num[d++] = c;
     return stoll(raw_num, d);
+}
+
+byte validate_bint(char* input) {
+    byte valid = *input == 'i';
+    char c;
+    while (valid && (c = *(++input)) >= '0' && c <= '9') continue;
+    return valid && *input == 'e';
 }
