@@ -26,7 +26,11 @@ typedef struct {
     unsigned int length;
 } ByteString;
 
-ByteString parse_bstring(char* input);
+// Parses a ByteString from a raw C string that is assumed to be valid.
+ByteString parse_bstring_unchecked(char* input);
+
+// Returns 1 if C string passed is a valid ByteString, 0 if not.
+unsigned char validate_bstring(char* input);
 
 /* Integer (Bencoding-specific)
  * Integers in this spec are encoded as 'i{n}e', where `n` represents a number. The
@@ -38,7 +42,11 @@ ByteString parse_bstring(char* input);
  * */
 typedef long long BInt;
 
-BInt parse_bint(char* input);
+// Parses a BInt from a raw C string that is assumed to be valid.
+BInt parse_bint_unchecked(char* input);
+
+// Returns 1 if C string passed is a valid BInt, 0 if not.
+unsigned char validate_bint(char* input);
 
 /* 
  * */
