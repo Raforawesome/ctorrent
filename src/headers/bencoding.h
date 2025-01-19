@@ -10,12 +10,10 @@
  * Example: "4:spam" represents the string "spam"
  * Note: No terminators
  *
- * field `raw` stores the raw input, and the "output", aka the `repr` field,
- * is simply just a pointer to the same string but advanced ahead by 2 bytes
- * to reference the string itself.
+ * The "output", aka the `repr` field, is simply just a pointer to the same string
+ * but advanced ahead by a few bytes.
  * */
 typedef struct {
-    char* raw;
     char* repr;
     unsigned int length;
 } ByteString;
@@ -24,14 +22,13 @@ ByteString parse_bstring(char* input);
 
 /* Integer (Bencoding-specific)
  * Integers in this spec are encoded as 'i{n}e', where `n` represents a number. The
- * integer is delimited by the constant chars 'i' and 'e'. The representation (`repr` field)
- * is set to long long as the spec mandates these must be parsed as 64-bit integers.
+ * integer is delimited by the constant chars 'i' and 'e'. The representation used here
+ * is set to long long as the spec mandates these must be parsed as 64-bit integers. 
  * Example: 'i42e' represents the integer (long long) 42.
+ *
+ * Since there is no need for a whole struct here, this one is a simple type alias for brevity.
  * */
-typedef struct {
-    char* raw;
-    long long repr;
-} BInt;
+typedef long long BInt;
 
 BInt parse_bint(char* input);
 
