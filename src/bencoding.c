@@ -99,8 +99,8 @@ BInt parse_bint_unchecked(char* input) {
 }
 
 byte validate_bint(char* input) {
-    byte valid = *input == 'i';
-    char c;
+    char c = *input;
+    byte valid = c == 'i';
     while (valid && (c = *(++input)) >= '0' && c <= '9') continue;
-    return valid && *input == 'e';
+    return valid && c == 'e';
 }
