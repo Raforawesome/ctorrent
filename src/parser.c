@@ -21,23 +21,33 @@ Args parse_args(int argc, char** argv) {
     int mflag = 0, tflag = 0, eflag = 0;
     int c;
 
-    while ((c = getopt(argc, argv, "mt") != 1)) {
+    while (((c = getopt(argc, argv, ":m:t:")) != -1) && !eflag) {
         switch (c) {
-            case 'm':
-                if (tflag) eflag++;
+            case 'm': // flag -m
+                if (tflag) eflag++; // if we also defined a file, this is an error
                 else {
                     args.paths.magnet_link = optarg;
                     mflag++;
                 }
-            case 't':
-                if (mflag) eflag++;
+                break;
+            case 't': // flag -t
+                if (mflag) eflag++; // if we also defined magnet, this is an error
                 else {
                     args.paths.file_path = optarg;
                     tflag++;
                 }
+                break;
+            case ':': // missing argument
+                fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+                break;
+            case '?': // unrecognized option
+                fprintf(stderr, "Option -%c not recognized.\n", optopt);
+                break;
+                
         }
     }
 
+    printf("mflag: %d, tflag: %d,  eflag: %d\n", mflag, tflag, eflag);
     if ((mflag || tflag) && !eflag) {
         return args;
     }
