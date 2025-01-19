@@ -1,0 +1,11 @@
+# IDE files
+.vscode/
+.idea/
+.fleet/
+
+# OS files
+.DS_Store
+
+# Build artifacts
+build/*
+
