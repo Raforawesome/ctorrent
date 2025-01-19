@@ -58,7 +58,7 @@ ByteString parse_bstring_unchecked(char* input) {
     // any string that needs more than 16 digits to represent its **LENGTH**
     // is a SIN and i dont care to support it
     char raw_num[16];
-    unsigned char d = 0; // keep track of digits using char because it's the smallest number
+    byte d = 0; // keep track of digits using char because it's the smallest number
     char c;
     while ((c = *input) != ':')  {
         raw_num[d++] = c; // add it to our number string (no checking needed)
@@ -68,7 +68,20 @@ ByteString parse_bstring_unchecked(char* input) {
     new.repr = ++input; // skip over ':'
     new.length = stoi(raw_num, d);
     return new;
+}
 
+byte validate_bstring(char* input) {
+    byte valid = 1, sep = 0;
+    char c;
+    while (valid && (c = *input) != '\0') {
+        if (c == ':') sep++;
+        else {
+            if (!sep) {
+                if (c < '0' || c > '9') valid = 0;
+            }
+        }
+    }
+    return valid && sep == 1;
 }
 
 BInt parse_bint_unchecked(char* input) {
