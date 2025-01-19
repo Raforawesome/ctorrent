@@ -13,6 +13,9 @@
 #ifndef __CTOR_BENCODING__
 #define __CTOR_BENCODING__
 
+// so we don't have to use 2 bytes for small vars
+typedef unsigned char byte;
+
 /* Byte String:
  * Byte strings are encoded like: <length in ASCII>:<string>
  * Example: "4:spam" represents the string "spam"
@@ -30,7 +33,7 @@ typedef struct {
 ByteString parse_bstring_unchecked(char* input);
 
 // Returns 1 if C string passed is a valid ByteString, 0 if not.
-unsigned char validate_bstring(char* input);
+byte validate_bstring(char* input);
 
 /* Integer (Bencoding-specific)
  * Integers in this spec are encoded as 'i{n}e', where `n` represents a number. The
