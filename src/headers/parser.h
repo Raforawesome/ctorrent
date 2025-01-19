@@ -11,8 +11,8 @@
  *   to run on all POSIX systems (argp doesn't work on Mac)
  * */
 
-#ifndef _CTOR_PARSER
-#define _CTOR_PARSER
+#ifndef __CTOR_PARSER__
+#define __CTOR_PARSER__
 
 typedef union {
     char* file_path;
