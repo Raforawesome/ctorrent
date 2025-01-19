@@ -17,6 +17,7 @@
 typedef struct {
     char* raw;
     char* repr;
+    unsigned int length;
 } ByteString;
 
 ByteString parse_bstring(char* input);
