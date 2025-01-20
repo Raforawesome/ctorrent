@@ -10,6 +10,7 @@
  * */
 
 #include "headers/bencoding.h"
+#include <stdlib.h>
 
 // Calculates integer powers. This function exists because we're only using powers
 // to get places of 10 and therefore don't need the entire overhead of floating point math.
@@ -67,22 +68,28 @@ ByteString parse_bstring_unchecked(char* input) {
     ByteString new;
 
     // any string that needs more than 16 digits to represent its **LENGTH**
-    // is a SIN and i dont care to support it
+    // is a *SIN* and i dont care to support it
     char raw_num[16];
+    unsigned long long bytes_read = 0; // we support up to 16 digits
     byte d = 0; // keep track of digits using char because it's the smallest number
     char c;
     while ((c = *input) != ':')  {
         raw_num[d++] = c; // add it to our number string (no checking needed)
         input++;
+        bytes_read++;
     }
     int len = stoi(raw_num, d);
     char new_str[len]; // allocate new string
     for (int i = 0; i < len; i++)
         new_str[i] = *(++input); // skip over ':'
     new_str[len] = '\0'; // null-terminate string
+    bytes_read += len;
+    bytes_read++; // account for ':'
 
     new.repr = new_str;
     new.length = len;
+    new.bytes_read = malloc(sizeof(unsigned long long));
+    *new.bytes_read = bytes_read;
     return new;
 }
 
@@ -109,9 +116,12 @@ BInt parse_bint_unchecked(char* input) {
     return stoll(raw_num, d);
 }
 
-byte validate_bint(char* input) {
+byte validate_bint(char* input) { // returns total bytes read
     char c = *input;
     byte valid = c == 'i';
-    while (valid && (c = *(++input)) >= '0' && c <= '9') continue;
-    return valid && c == 'e';
-}
+    while (valid && (c = *(++input)) >= '0' && c <= '9') valid++;
+    if (c == 'e' && valid++) // add one for ending delimiter
+        return valid;
+    else
+        return -1;
+} 

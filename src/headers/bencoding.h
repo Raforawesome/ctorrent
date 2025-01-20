@@ -28,12 +28,12 @@ typedef enum {
  * Example: "4:spam" represents the string "spam"
  * Note: No terminators
  *
- * The "output", aka the `repr` field, is simply just a pointer to the same string
- * but advanced ahead by a few bytes.
+ * output field `repr` contains a copy of the string that was parsed.
  * */
 typedef struct {
     char* repr;
     unsigned int length;
+    unsigned long long *bytes_read; // de-allocated after use
 } ByteString;
 
 // Parses a ByteString from a raw C string that is assumed to be valid.
