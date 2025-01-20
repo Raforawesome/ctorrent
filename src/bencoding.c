@@ -189,3 +189,66 @@ static inline void bdict_add_node(BDict* dict, BDictNode* node) {
     dict->length++;
 }
 
+BDict parse_bdict_unchecked(char *input) {
+    BDict dict;
+    dict.length = 0;
+    dict.head = NULL;
+    unsigned long long bytes_read = 0;
+    input++; // skip the 'd'
+
+    char c;
+    while ((c = *input) != 'e') {
+        BDictNode* node = malloc(sizeof *node);
+        node->next = NULL;
+        if (c == 'i') { // case: bencoded integer
+            long long* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bint_unchecked(input);
+            node->key = (void*) node_data;
+            node->key_type = BInt_t;
+        } else if (c == 'l') { // recursively parse list
+            BList* node_data = malloc(sizeof *node_data);
+            *node_data = parse_blist_unchecked(input);
+            node->key = (void*) node_data;
+            node->key_type = BList_t;
+        } else if (c == 'd') { // parse dictionary
+            BDict* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bdict_unchecked(input);
+            node->key = (void*) node_data;
+            node->key_type = BDict_t;
+        } else { // must be a string, no one would call an unchecked function with invalid data right?
+            ByteString* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bstring_unchecked(input);
+            node->key = (void*) node_data;
+            node->key_type = BString_t;
+        }
+        input += last_read;
+        bytes_read += last_read;
+        if (c == 'i') { // case: bencoded integer
+            long long* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bint_unchecked(input);
+            node->value = (void*) node_data;
+            node->value_type = BInt_t;
+        } else if (c == 'l') { // recursively parse list
+            BList* node_data = malloc(sizeof *node_data);
+            *node_data = parse_blist_unchecked(input);
+            node->value = (void*) node_data;
+            node->value_type = BList_t;
+        } else if (c == 'd') { // parse dictionary
+            BDict* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bdict_unchecked(input);
+            node->value = (void*) node_data;
+            node->value_type = BDict_t;
+        } else { // must be a string, no one would call an unchecked function with invalid data right?
+            ByteString* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bstring_unchecked(input);
+            node->value = (void*) node_data;
+            node->value_type = BString_t;
+        }
+        input += last_read;
+        bytes_read += last_read;
+        bdict_add_node(&dict, node);
+    }
+
+    last_read = bytes_read;
+    return dict;
+}
