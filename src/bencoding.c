@@ -12,6 +12,8 @@
 #include "headers/bencoding.h"
 #include <stdlib.h>
 
+static int last_read = 0; // the ultimate sin
+
 // Calculates integer powers. This function exists because we're only using powers
 // to get places of 10 and therefore don't need the entire overhead of floating point math.
 static int ipow(int b, int n) {
@@ -88,8 +90,7 @@ ByteString parse_bstring_unchecked(char* input) {
 
     new.repr = new_str;
     new.length = len;
-    new.bytes_read = malloc(sizeof(unsigned long long));
-    *new.bytes_read = bytes_read;
+    last_read = bytes_read;
     return new;
 }
 
@@ -113,6 +114,7 @@ BInt parse_bint_unchecked(char* input) {
     char c;
     while ((c = *(++input)) != 'e') // skip first letter
         raw_num[d++] = c;
+    last_read = d + 2;
     return stoll(raw_num, d);
 }
 
@@ -125,3 +127,65 @@ byte validate_bint(char* input) { // returns total bytes read
     else
         return -1;
 } 
+
+BDict parse_bdict_unchecked(char* input); // declare beforehand to use in list parser
+
+static inline void blist_add_node(BList* list, BListNode* node) {
+    if (list->head == NULL) {
+        list->head = node;
+    } else {
+        list->head->next = node;
+    }
+    list->length++;
+}
+
+BList parse_blist_unchecked(char* input) {
+    BList list;
+    list.length = 0;
+    list.head = NULL;
+    unsigned long long bytes_read = 0;
+    input++; // skip the 'l'
+    
+    char c;
+    while ((c = *input) != 'e') {
+        BListNode* node = malloc(sizeof *node);
+        node->next = NULL;
+        if (c == 'i') { // case: bencoded integer
+            long long* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bint_unchecked(input);
+            node->data = (void*) node_data;
+            node->type = BInt_t;
+        } else if (c == 'l') { // recursively parse list
+            BList* node_data = malloc(sizeof *node_data);
+            *node_data = parse_blist_unchecked(input);
+            node->data = (void*) node_data;
+            node->type = BList_t;
+        } else if (c == 'd') { // parse dictionary
+            BDict* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bdict_unchecked(input);
+            node->data = (void*) node_data;
+            node->type = BDict_t;
+        } else { // must be a string, no one would call an unchecked function with invalid data right?
+            ByteString* node_data = malloc(sizeof *node_data);
+            *node_data = parse_bstring_unchecked(input);
+            node->data = (void*) node_data;
+            node->type = BString_t;
+        }
+        blist_add_node(&list, node);
+        input += last_read;
+        bytes_read += last_read;
+    }
+    
+    last_read = bytes_read;
+    return list;
+}
+
+static inline void bdict_add_node(BDict* dict, BDictNode* node) {
+    if (dict->head == NULL) {
+        dict->head = node;
+    } else {
+        dict->head->next = node;
+    }
+    dict->length++;
+}
+
