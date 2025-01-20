@@ -223,6 +223,7 @@ BDict parse_bdict_unchecked(char *input) {
         }
         input += last_read;
         bytes_read += last_read;
+        c = *input; // shouldn't ever be 'e', dict keys come in pairs
         if (c == 'i') { // case: bencoded integer
             long long* node_data = malloc(sizeof *node_data);
             *node_data = parse_bint_unchecked(input);

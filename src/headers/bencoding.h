@@ -68,8 +68,12 @@ typedef struct __CTOR_BLIST_NODE__ { // need an ugly name to reference in `next`
 
 typedef struct {
     BListNode* head;
-    int length;
+    unsigned int length;
 } BList;
+
+BList parse_blist_unchecked(char* input);
+
+unsigned char validate_blist(char* input);
 
 /* 
  * */
@@ -86,7 +90,12 @@ typedef struct __CTOR_BDICT_NODE__ { // need an ugly name to reference in `next`
 
 typedef struct {
     BDictNode* head;
+    unsigned int length;
 } BDict;
+
+BDict parse_bdict_unchecked(char* input);
+
+unsigned char validate_bdict(char* input);
 
 #endif
 
