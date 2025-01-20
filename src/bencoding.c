@@ -34,19 +34,30 @@ static long long llpow(long long b, int n) {
 // [s]tring [to] [i]nteger
 int stoi(char* s, int n) {
     int num = 0;
+    byte neg = 0;
+    if (*s == '-') {
+        neg++;
+        s++;
+    }
     for (int i = 0; i < n; i++) {
         num += ipow(10, n - i - 1) * (s[i] - 48);
     }
-    return num;
+    return neg ? -num : num;
 }
 
 // [s]tring [to] [l]ong [l]ong  
 long long stoll(char* s, int n) {
     long long num = 0;
+    byte neg = 0;
+    if (*s == '-') {
+        neg++;
+        s++;
+    }
     for (int i = 0; i < n; i++) {
         num += llpow(10, n - i - 1) * (s[i] - 48);
     }
     return num;
+    return neg ? -num : num;
 }
 
 // parses a `ByteString` from a raw C string.
